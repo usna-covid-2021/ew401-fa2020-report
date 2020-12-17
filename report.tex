@@ -1,0 +1,913 @@
+﻿\documentclass[10pt]{article}
+
+\title{Contagion Crushing Corporation and Partnership -- MedBot}
+\author{MIDN 1/C Nathan Dietrich, Alex Peralta, and Corwin Stites}
+\date{December 3, 2020}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+With the outbreak of the COVID-19 pandemic the social distancing and isolation of potential carriers and sick patients has become crucial. Autonomous systems provide a unique ability to interact with patients while allowing healthcare workers to remain distant from a potential carrier of a virulent disease. This use of mobile autonomous systems has potential to protect medical workers and conserve personal protective equipment. This project focuses on the application of an autonomous mobile system to the collection of a patient’s vital signs at the request of our customer, the head of USNA’s COVID-19 response, CAPT Saperstein M.D. The project focus has become centered on providing a payload to interface with Boston Dynamics’ Spot mobile robot. This payload will provide the necessary sensors, actuators, controllers, and interface to interact with patients and take medical data. As we reach the closure of this semester, we have narrowed our design focus and begun doing the preliminary work of developing our sensor, actuator, and microcontroller interface. This paper describes the problem assessment, design decisions, and preliminary work on the ground based robot payload which will identify patients and scan patients’ vital signs into a database for medical personnel access. 
+\end{abstract}
+
+%\tableofcontents
+
+\section{1. Introduction}        
+As we returned to USNA at the beginning of the semester the ongoing COVID-19 pandemic was drastically altering life for people in the US and  around the world. As the semester has progressed, emergency rooms and intensive care units have continued to be  inundated with COVID-19 patients. Personal protective equipment continues to be in short supply and medical workers continue to be overworked and put at constant risk as they treat patients with the disease. Engineering is all about using science and technology to find solutions to problems and many engineering firms have already begun using autonomous systems to solve problems presented by the pandemic. We saw our capstone project as an opportunity to gain research experience into a subject that could be beneficial to a very pressing problem in our society. We choose to focus our project on investigating how we could build an autonomous system that could be used to help patients and medical workers being affected by COVID-19 and any other dangerous disease in the future.
+
+\subsection{1. Customer Interview}
+Our customer for this project is CAPT Adam Saperstein, MD. CAPT Saperstein is a graduate of the US Naval Academy. After graduating from Tulane University Medical School and completing his residency at Naval Hospital, Bremerton CAPT Saperstein practiced family medicine at naval bases across the fleet in the United States, Japan, and Italy. He then joined the faculty at the Uniformed Services University where his research focused on applying innovative technology to medicine. CAPT Saperstein now works as a health care provider at the Brigade Medical Unit. CAPT Saperstein was deeply involved in the US Naval Academy’s response to the COVID-19 pandemic and served as an architect for the policies implemented to return the Brigade to USNA following the crisis’ onset. With extensive medical experience in the fleet as well as knowledge of what is required to contain a dangerous disease in a population, we knew that CAPT Saperstein could add a unique and valuable perspective to our project. We sought him out in order to find out what needs of health care providers an autonomous system could meet with regards to the COVID-19 pandemic both at USNA and in the health care community as a whole. 
+
+Our interview with CAPT Saperstein moved us in an unexpected direction. CAPT Saperstein suggested that we create a system that could be used more for any form of virulent disease as well as in health care generally. This, he said, would improve the applicability of the platform since COVID-19 is not necessarily dangerous enough to present a need that would merit the development of a dedicated robotic system. Consequently, CAPT Saperstein suggested that we move to a platform that instead of merely scanning temperatures of potential COVID patients also took other crucial vital signs such as blood pressure, blood oxygen levels, and pulse rate. The broad capabilities of this platform means that it wouldn’t be useful for just COVID-19 but for treating dangerous diseases like Ebola, SARS, or MERS as well. More generally, it could also be used for routine check ups with patients.
+ 
+CAPT Saperstein suggested we use the mobile robotic system to address the isolation that patients can feel during a pandemic. Being isolated in a hospital with a dangerous disease can lead people to feel removed from healthcare workers and loved ones. He suggested that we use a mobile robot, a system that could safely get near a patient, to address this issue. He conjectured that having a tablet attached to the system where a patient could input how they were feeling not just physically but emotionally as well as being equipped with the option to talk to a doctor or loved one not clad in PPE could help solve this problem. 
+
+Finally, CAPT Saperstein suggested that we implement a way for the bot to automatically disinfect itself. This could be done with chemical disinfectants but he also pointed out that UV lights have proven success with disinfecting medical spaces. He suggested we create a UV light gate that the mobile system could move through in order to be routinely disinfected or a UV light device that could be fixed on the platform. 
+
+While the scope of our project did not allow us to implement all of CAPT Saperstein’s ideas, his perspective as a medical professional undoubtedly helped us to shift the focus of the project in a direction that would meet a real need of himself and other healthcare providers. After compiling and discussing all the ideas and information that CAPT Saperstein gave us, we synthesized his needs into a customer point of view statement that we would use going forward in the process.
+CAPT Saperstein needs a system that can collect patients’ vital signs information because it is dangerous, work intensive, and wasteful of PPE for a medical worker to carry out this function on a patient with a virulent disease. 
+
+\subsection{2. Background}
+Those who could benefit from a system like ours include both the medical workers who care for patients with a virulent disease and the patients who are being treated. Both of these groups are affected by distinct negative aspects during a pandemic. We wanted to use the domain of autonomous systems to produce a system that could provide benefits to both of these parties. 
+
+Our first motivation for this project was to allow healthcare workers to remain distanced from patients with a dangerous disease. Remaining distanced from an infected individual is crucial for preventing transmission. Unfortunately, this is not always attainable when a medical worker is required to treat a patient. Robots have been used for years now to remove people from dangerous situations and this capability can and should be applied to healthcare. As was reported by Boston Dynamics in their memo about their pandemic response, when the firm polled hospitals on if autonomous systems would be useful to for pandemic response, during the height of the COVID-19 outbreak some hospitals had up to 40\% of their staff contract the virus, greatly reducing the facility’s ability to staff their treatment wards and putting the lives of the health workers and their families at risk. We want a system that could carry out basic tasks that would otherwise fall to medical workers in order to reduce their exposure to patients with dangerous diseases. Additionally, medical workers treating a dangerous disease must use a large amount of PPE which as COVID-19 shows can run drastically short during a pandemic. We wanted our system to reduce the amount that medical workers would need to don PPE in order to conserve its limited quantities. 
+
+Our second motivation was to reduce the workloads of medical workers during a pandemic. The large influx into hospitals and treatment centers during a pandemic can stretch medical workers desperately thin. The COVID-19 pandemic showed that the long hours, constant danger, and the difficulty of treating dying patients can leave medical workers strained both physically, mentally, and emotionally. We want our system to step into the role of routine check ins on patients so medical workers could be left to focus on more complex tasks. By alleviating the need for medical workers to have to carry out certain simple and routine yet time consuming functions, our system would help to relieve at least some portion of the workload for already overworked health workers.
+ 
+Our final motivation for this project was to provide a method of interaction for patients in isolation.  It is crucial for patients with a dangerous disease to remain isolated until they can recover. This can, understandably, leave the patient feeling isolated from others when the only face to face interaction they can experience is with health workers clad in PPE. We want our system to provide some interactive components for the patient that would help them to feel more connected to the outside world. This can help reduce the psychological toll isolation can take. Whether it was providing a method for patients to talk face-to-face with their doctors or family virtually or to provide a method for patients to indicate if they want to see someone in person or to signal emotional distress, we wanted some sort of component that would make the bot more “human” for the patients it would interact with to improve the overall wellbeing of the patient. 
+
+\section{2. Problem Statement}
+\subsection{1. Problem Statement}
+We combined what we had learned from our customer interview and background research into a cohesive problem statement. The statement is as follows:
+\begin{quote}        
+We will deliver a system that will increase safety and reduce workload for medical workers interacting with a contagious disease. The system will gather vital signs such as blood oxygen levels, heart rate, blood pressure, and temperature via a mobile robot platform. This will reduce work for personnel, conserve PPE, and allow personnel to maintain safe distancing from the patient. Our deliverable will read patients’ vital signs and log them into a database for medical personnel to use. It will also match the vital signs with individuals by scanning a patient’s ID. It will flag those patients with abnormal vital signs and notify medical personnel. It should strive to gather vitals and scan IDs accurately and efficiently as well as store the information in a user friendly database. It should also strive to be a project with the potential to be executed in a virtual environment. The project must reliably gather and store data. It must also be safe to be around. Lastly, medical personnel must be able to access the patients’ information from the database. 
+\end{quote}
+
+In fewer words, we want to create an autonomous system that addresses challenges created by a contagious disease like COVID-19. This mobile robot platform will identify a patient, take their vital signs, save the information in a database, and flag abnormal vitals. It will carry out these functions as quickly and accurately as possible while allowing users to stay socially distant. It will save the information in the most user friendly database possible. The data must be accessible and the bot must be safe for patients. The following figure illustrates our thinking process as we moved from simply defining our problem to actually drafting ideas of how the problem could be solved.
+  
+
+Figure 1: An early conceptual diagram of a design that we envisioned could meet the specifications of our problem statement.
+
+\subsection{2. Functions}
+        The primary function for this project is to read patient’s vital signs. The vital signs will be blood oxygen level, pulse rate, temperature, and blood pressure. Additionally, the robot needs to accurately flag abnormal vital signs, notify medical staff of flagged vital signs, log vital signs into a database, keep patients socially distant and read the patients ID. For the system to meet the bare minimum of meeting the requirements set out in our problem statement, the system will need to carry out these functions. The following function means tree illustrates the process of how we broke our problem statement into our desired functions as well as how we broke each of those functions into various means of achieving the functions that we could then choose from when selecting the attributes of our system design.
+  
+
+Figure 2: A function means tree outlining our lowest level functions, our evaluated functions, and outlining possible means for each function. 
+Now that we identified our functions, we could begin to envision what basic system layout we would need to meet our functions. The following functional block diagram illustrates a high level evaluation of how we would need to construct the system and its subsystems to meet all of our functional requirements. 
+  
+
+Figure 3: A functional block diagram illustrating how the various parts of the system would be constructed to meet the system’s desired functions.
+
+\subsection{3. Constraints}
+The primary constraint is that the robot must save readings into a database. Without a functioning database the patient’s vital signs would not be recorded and medical staff would not be able to determine the infection rate of a virulent disease, completely failing to address the primary issue this problem set out to tackle. Another constraint is that medical personnel must have a way to access the database. Without the ability for medical professionals to access the data collected from the mobile platform, there is no way to determine the patient’s health and general well-being. The final constraint of this project regards the safety of  the mobile platform; the platform must be safe to be around. A system that is not safe for patients cannot be allowed to operate in a medical facility.
+
+\subsection{4. Objectives, Pairwise Comparison Chart, and Weightings}
+        After consulting our adviser, engaging with our customer, and evaluating our preferences in accordance with industry standards, we settled on the following objectives for the system. The six main objectives of this project are as follows: quickly scans vital signs, accurately scans vital signs, efficiently organizes data in a user friendly database, accurately identifies patients through ID scanning, executable in a virtual environment, and promotes social distancing. 
+        
+        To determine the weighting for each objective that we would use in our decision making process, we used a pair-wise comparison chart, as shown in Figure 4. Additionally, based on two customer interviews with CAPT Saperstein, we inferred a customer weight for each individual objective. The chart works by comparing each objective to every other objective and assigning it a 1 if it is seen as more important than the objective it is compared to and a 0 if it is less important. Then a customer weight between 1 and 5 is added to serve as the customer input to the decision. Finally, 1 is added to ensure no objective scores a zero. As can be seen in the figure, we determined that Objective \#2 (Project must scan patient’s vital signs accurately) is the primary objective for this project. 
+
+%
+%Objective Weighting
+%	Quick Vital Scan
+%	Accurate Vital Scan
+%	User Friendly Database
+%	Accurate ID Scanning
+%	Executable in Virtual Environment
+%	Score
+%	Customer Weight
+%(1-5 Scale)
+%	Client Weight +PPC+1
+%	Quick Vital Scan
+%	NA
+%	0
+%	0
+%	1
+%	1
+%	2
+%	4
+%	7
+%	Accurate Vital Scan
+%	1
+%	NA
+%	1
+%	1
+%	1
+%	4
+%	5
+%	10
+%	User Friendly Database
+%	0
+%	0
+%	NA
+%	0
+%	1
+%	1
+%	2
+%	4
+%	Accurate ID Scanning
+%	1
+%	0
+%	1
+%	NA
+%	1
+%	3
+%	3
+%	7
+%	Executable in Virtual Environment
+%	0
+%	0
+%	0
+%	0
+%	NA
+%	0
+%	1
+%	2
+	
+Figure 4: A pair-wise comparison chart listing the weights for each object. Used to determine the primary objective. 
+   
+\subsection{5. Metrics}
+        The metrics used to measure the performance of a proposed concept with respect to the objective is based on a 0-4 scale. 0 denotes the candidate design as not being useful towards the project and 4 denotes the candidate design as being optimal. The justification for each score varies depending on the objective. 
+%
+%Objective 1: Scans patients' vital signs quickly
+%	Metrics
+%	Time to Read Vital Signs (s)
+%	Score
+%	Justification (dependent on slowest vital sign sensor)
+%	>300
+%	0 (not useful)
+%	3x
+%	300-240
+%	1
+%	2x
+%	240-180
+%	2 (acceptable)
+%	1.5x
+%	180-120
+%	3
+%	1.25x
+%	<120
+%	4 (optimal)
+%	1.0x
+%	
+
+Figure 5: Objective 1 metrics and justification.
+
+
+The metrics for Objective 1 seen in Figure 5, were based on the time it takes for the entire system to scan vital signs, also shown in Figure 5. A typical blood pressure cuff takes approximately two minutes to complete its reading. These metrics show how successful our design is in implementing multiple sensors at once. A score of zero shows the system is inefficient as the time it takes the system is greater than the slowest sensor time (the blood pressure cuff time to sense). This means that the system cannot effectively implement multiple sensors at once in order to reduce the time required to gather the measurements. A score of four indicates that our system is time efficient and can implement multiple sensors at once. 
+%
+%
+%
+%
+%Objective 2: Scans patients' vital signs accurately
+%	Metrics
+%	Accuracy Resolution of Sensor (% Variability/Total Range)
+%	Score
+%	Justification (based on industry standard)
+%	<80%
+%	0 (not useful)
+%	Grossly below
+%	80-90%
+%	1
+%	Below
+%	90-95%
+%	2 (acceptable)
+%	At standard
+%	95-99%
+%	3
+%	Above
+%	>99%
+%	4 (optimal)
+%	Near perfect accuracy
+	
+
+Figure 6: Objective 2 metrics and justification.
+
+
+The metrics for Objective 2 were based on the accuracy resolution of the system of a potential sensor, as shown in Figure 6. While what accuracy can be reasonably expected from a sensor varies with each type of sensor, based on our research, we determined that a typical mid-grade off the shelf medical sensor has an accuracy resolution of about 90-95\%. A typical blood pressure cuff, for example, has an accuracy resolution of around 92\%. Based on this we defined a score of 3 as meeting this standard.
+
+%
+%Objective 3: Efficiently organizes data in a user friendly database
+%	Metrics
+%	Degree of Database Usability
+%	Score
+%	Justification
+%	Only numbers in an unorganized format.
+%	0 (not useful)
+%	Useless. Impossible to discern and analyze the information.
+%	Data is shown in a bare bones interface.
+%	1
+%	Not impossible but difficult to decipher.
+%	No graphics but somewhat developed interface.
+%	2 (acceptable)
+%	Would be able to process but at a slow pace.
+%	All data shown in a well developed interface with graphic representation.
+%	3
+%	Allows for seamless use but lacks helpful graphics.
+%	All data shown in graphics with data trends in a well developed interface
+%	4 (optimal)
+%	Greatest ease of access. Would show helpful data trends with effective graphics.
+%	
+
+Figure 7: Objective 3 metrics and justification.
+
+
+The database is a vital part of this project since it will organize the collected vital sign data into a format that can be used by medical personnel. Since the database must be user friendly the metrics were chosen on the ease of access the database provides. From Figure 7, a score of zero indicates that the database is totally useless and it is impossible to discern and analyze the collected information. Meanwhile, a database with a score of four would provide the greatest ease of access and would show data trends and graphics. 
+
+
+
+
+%
+%
+%
+%
+%
+%
+%Objective 4: Accurately identifies patients through ID scanning
+%	Metrics
+%	Accuracy Rate of the Sensor
+%	Score
+%	Justification (based on our desired accuracy)
+%	<85%
+%	0 (not useful)
+%	Grossly below
+%	85-90%
+%	1
+%	Below
+%	90-95%
+%	2 (acceptable)
+%	At standard
+%	95-99%
+%	3
+%	Above
+%	>99%
+%	4 (optimal)
+%	Near perfect accuracy
+%	
+
+Figure 8: Objective 4 metrics and justification.
+
+
+Another important facet to this project is patient ID scanning. The collected vital signs and database would be worthless if medical personnel did not know which patient’s vital signs they were looking at. As such, the metrics are based on accuracy with a fair margin of error, an acceptable range would be between 90-95\%, shown in Figure 8. 
+
+%
+%Objective 5: Executable in COVID-19 virtual environment
+%	Metrics
+%	Ease of Distance Learning
+%	Score
+%	Justification
+%	100% Hardware based
+%	0 (not useful)
+%	Unable to do any section of project virtually.
+%	3/4 Hardware 1/4 Software
+%	1
+%	Can complete some sections virtually.
+%	50% Hardware/Software
+%	2 (acceptable)
+%	Able to provide proof of concept.
+%	1/4 Hardware 3/4 Software
+%	3
+%	Able to complete the majority of the project.
+%	100% Software based
+%	4 (optimal)
+%	Can fully complete the project.
+%	
+
+Figure 9: Objective 5 metrics and justification.
+The next metric is due to the COVID-19 environment and the possibility of not accomplishing this project in-person. The ease at which this project can be done remotely would result in a higher score. From Figure 9, an optimal mark would mean that 100\% of the project can be done in a remote setting while a score of zero would mean no section of the project could be done virtually. 
+
+%
+%Objective 6: Allows patients and workers to safely distance.
+%	Metrics
+%	Degree of User Distancing
+%	Score
+%	Justification
+%	System brings patients and workers into close proximity with high probability of equipment contamination.
+%	0 (not useful)
+%	Provides a likely vector of disease transmission.
+%	Patients and workers brought into contact. Possibility for equipment contamination. 
+%	1
+%	Reasonable risk of disease transmission.
+%	Patients and workers not brought into direct contact. Possibility for equipment contamination.
+%	2 (acceptable)
+%	Reduces risk of disease transmission but leaves some vulnerabilities.
+%	Patients and workers not brought into direct contact. Low possibility for equipment contamination.
+%	3
+%	Reduces risk of disease transmission with few vulnerabilities.
+%	Patients and workers are completely isolated. Extremely low possibility for equipment contamination.
+%	4 (optimal)
+%	Reduces risk of disease transmission with virtually no vulnerabilities for transmission.
+%	
+
+Figure 10: Objective 6 metrics and justification.
+
+
+Our final metric measures the ability of the device to prevent person to person transmission of a dangerous disease through its use either by carrying a pathogen on the device or by requiring patients to leave isolation to use it. The metrics for this objective are shown in Figure 10. The highest scoring designs will be able to go to patients in isolation as well as have the ability to be easily disinfected. This objective was added later in the design process to better focus what we wanted our design to strive for. Using a new pair-wise comparison chart, it was assigned a weight value of 8.
+
+\section{3. Related Work}
+Background Research Design 1 - Boston Dynamics COVID-19 Bot: The Boston Dynamics COVID-19 Bot is a mobile ground unit equipped with computer vision that can autonomously approach patients in order for patients to remotely talk to health professionals. The primary attribute we wanted to emulate was its mobile and sleek design, leading to an effective way of approaching patients in a socially distanced manner. However, this design focuses on telemedicine rather than actively using medical sensors on the patient. While a useful reference, we wanted to focus on active interaction with the patient via medical sensors rather than telemedicine. We later decided to make the project focus to create a payload to go on the mobility platform used by this design.
+
+Background Research Design 2 - Quadrotor Prototype: The Quadrotor Prototype developed by a research team in Mexico is an autonomous mobile air unit equipped with multiple sensors that use a path following technique based on a path variable over a specific geometric curve. The primary attribute we wished to emulate for our UAV is the ability to autonomously patrol a space to check in on patients. However, the research paper utilized a very specific bot with custom sensors and equipment, meaning that it would be difficult to implement such a design in our own aerial bot. 
+
+Background Research Design 3 - Humanoid Robot with Thermal Scanner: Used in large venue-type settings such as shopping malls, TSA security checkpoints, university campuses, etc. Uses a facial recognition software to calculate the angle of the person’s facial structure and uses the calculation to control the height of the thermal scanner.  Data processing is done via a microcontroller. While easier to implement than the mobile systems and while the computer vision system used to position the thermal scanner is a common theme between this and our project, the stationary nature of this design would mean patients would have to leave isolation to come to it, thus negating one of the primary goals of the project.
+
+We found design 1 to be the most feasible design applicable to our desired functions, due to the fact that Spot has many different applications and is a versatile system. The other two designs are not as practical and would require a significant amount of extra things to worry abou, such as flight paths for the quadrotor and lack of mobility for the humanoid robot. 
+
+\section{4. Conceptual Designs}
+In brainstorming our conceptual designs, we considered our four different functions, each with 4 different means of accomplishing the function. In each design, we also considered the effectiveness of the robot’s basic design (whether it was stationary, moved on the ground, or moved in the air). Below are the function means of each of the three designs we procured.
+\subsection{6. Concept 1:  Ground Bot}
+%Function
+%	Means 1
+%	Means 2
+%	Means 3
+%	Means 4
+%	Read Vital Signs
+%	Only IR thermometer.
+%	IR thermometer, pulse oximeter, BP cuff.
+%	FLIR camera, pulse oximeter, BP cuff.
+%	Only FLIR camera.
+%	Flag Abnormal Vital Signs and Notify Medical Staff 
+%	Mark in database 
+%	Send email.
+%	Send text.
+%	Create notification in database.
+%	Log into a Database
+%	Excel spreadsheet.
+%	MATLAB Script.
+%	C/C++/Python based software.
+%	
+%
+%	Read Patient ID
+%	QR Code.
+%	Bar Code.
+%	Facial Recognition.
+%	Room identification.
+%	
+%
+Figure 11: Ground bot conceptual design.
+Our first design was a mobile ground unit with a mechanical arm mounted with an IR sensor. The rest of the medical sensors (pulse oximeter, blood pressure cuff) are located on the top of the base. In order to save data, the bot would utilize a C based serial connection linked to an onboard Raspberry Pi. The bot would also have computer vision via a front mounted camera for autonomous motion. In order to identify patients, the bot would be equipped with an ID barcode scanner. Concerning effectiveness, this design would allow the bot to be more agile than the stationary bot, but less complex in its movements compared to the UAV. 
+
+Figure 12: Ground bot conceptual design illustration.
+
+\subsection{7. Concept 2:  UAV}
+%Function
+%	Means 1
+%	Means 2
+%	Means 3
+%	Means 4
+%	Read Vital Signs
+%	Only IR thermometer.
+%	IR thermometer, pulse oximeter, BP cuff.
+%	FLIR camera, pulse oximeter, BP cuff.
+%	Only FLIR camera.
+%	Flag Abnormal Vital Signs and Notify Medical Staff 
+%	Mark in database 
+%	Send email.
+%	Send text.
+%	Create notification in database.
+%	Log into a Database
+%	Excel spreadsheet.
+%	MATLAB Script.
+%	C/C++/Python based software.
+%	
+%
+%	Read Patient ID
+%	QR Code.
+%	Bar Code.
+%	Facial Recognition.
+%	Room identification.
+Figure 13: UAV conceptual design.
+
+Our second design was an unmanned aerial vehicle (UAV) that would utilize a FLIR camera to read patient’s vital signs. The FLIR camera would identify a person’s forehead using heat signatures, and would fly up to the patient’s forehead and take a temperature reading. The patient, in turn, would show the robot a card with a QR code specific to that person. If a patient’s temperature was above 100.3 degrees F, the bot would mark the information in a localized database and send a text to the patient’s phone, as well as medical personnel. The bot would use C code to log the information onto an onboard Raspberry Pi. Concerning effectiveness, the UAV would be faster in potential speed than the mobile or stationary ground bots, but its movement would be by far the most computationally complex, and the FLIR camera may or may not be inaccurate due to the aerial platform.
+
+Figure 14: UAV conceptual design illustration.
+
+\subsection{8. Concept 3:  Stationary Unit}
+%Function
+%	Means 1
+%	Means 2
+%	Means 3
+%	Means 4
+%	Read Vital Signs
+%	Only IR thermometer.
+%	IR thermometer, pulse oximeter, BP cuff.
+%	FLIR camera, pulse oximeter, BP cuff.
+%	Only FLIR camera.
+%	Flag Abnormal Vital Signs and Notify Medical Staff 
+%	Mark in database 
+%	Send email.
+%	Send text.
+%	Create notification in database.
+%	Log into a Database
+%	Excel spreadsheet.
+%	MATLAB Script.
+%	C/C++/Python based software.
+%	
+%
+%	Read Patient ID
+%	QR Code.
+%	Bar Code.
+%	Facial Recognition.
+%	Room identification.
+%	
+%
+Figure 15: Stationary bot conceptual design.
+
+        Our third design was a stationary ground unit that would have the full array of sensors available in a certain location. The station would be equipped with a FLIR camera, pulse oximeter, and blood pressure cuff in order to read a patients’ vital signs. The station would use an excel spreadsheet-based system to log all patients data for transmission to medical personnel. The FLIR camera would use facial recognition to ensure the patient’s face is in the proper position for an accurate temperature check. Any abnormal vital signs would be flagged and medical personnel would be notified via text message. Concerning effectiveness, this station design may bring about the most accurate measurements for the temperature, but its stationary nature would mean concentrating patient movement to a central location, potentially being a safety hazard. 
+  
+Figure 16: Stationary bot conceptual design illustration.
+
+\subsection{9. Decision Matrix}
+The following figure illustrates our evaluation of each conceptual design in order to determine what sort of system we wanted to implement. The decision matrix first evaluates if each design meets our hard constraints. Failure to meet these would immediately disqualify the design. Each design is then given a metric score based on what metric it achieves from our objective metric charts (Figures 5-10). Next using the weights assigned to each objective in our pair-wise comparison chart (Figure 4) the final score is calculated by summing the values of each objective's metric score multiplied by the objective’s weight. 
+%
+%Design Constraints (C) & Objectives (O)
+%	Weight
+%	Design Candidates
+%	Ground Bot
+%	UAV Bot
+%	Stationary Bot
+%	C1: Information Database
+%	x
+%	y
+%	y
+%	y
+%	C2: Accessible to Medical Personnel
+%	x
+%	y
+%	y
+%	y
+%	C3: Safe
+%	x
+%	y
+%	y
+%	y
+%	
+%
+%	
+%
+%	Metric
+%	Weighted
+%	Metric
+%	Weighted
+%	Metric
+%	Weighted
+%	O1: Quickly Reads Vital Signs
+%	7
+%	3
+%	21
+%	1
+%	7
+%	3
+%	21
+%	O2: Accurate
+%	10
+%	3
+%	30
+%	2
+%	20
+%	4
+%	40
+%	O3: User Friendly Database
+%	4
+%	3
+%	12
+%	2
+%	8
+%	4
+%	16
+%	O4: Accurate ID of Patient
+%	7
+%	4
+%	28
+%	1
+%	7
+%	4
+%	28
+%	O5: Executable in Virtual Environment
+%	2
+%	2
+%	4
+%	1
+%	2
+%	1
+%	2
+%	O6: Allows Workers and Patients to Distance
+%	8
+%	4
+%	32
+%	4
+%	32
+%	2
+%	16
+%	Total Weighted Score
+%	
+%
+%	127
+%	76
+%	123
+%	
+Figure 17: Our decision matrix evaluation showing the ground bot design as the winner.
+
+We ultimately decided on Design 1 (Mobile Ground Unit), as it demonstrated the best combination of effective movement with accurately utilizing the full array of sensors. Though we determined the stationary ground unit to be the most effective in terms of accurate temperatures, the mobile ground unit’s mobility (promoting social distancing) led to the determination that Design 1 was the best for our objectives.
+
+\section{5. Ethical Considerations}
+The primary ethical consideration for this project is to ensure patient and medical personnel safety. Our ground bot is meant to operate and collect vital signs for heavily virulent diseases. The intention is to minimize contact between patients and medical workers by reducing their interaction and thus limiting the risk associated with infectious diseases. Not all risk will be reduced since the ground bot will be exposed to the infected patients and there is a possibility of cross contamination should a medical worker interact with the bot prior to its sanitization. Additionally, this bot could be used maliciously if an outside agent chooses to manipulate the data. One of the project’s objectives is to collect highly accurate data. Should an outside agent gain access to the vital sign database and alter the readings, this could lead to medical personnel’s misinterpretation of the data and serious illness or death. Since medical data is being collected, patient confidentiality needs to be considered when designing the database as well. 
+
+\section{6. Engineering Standards and Specifications}
+Concerning Engineering Standards and Specifications, we utilized the I2C Serial communication Bus Standard in order to have the MCU and IR sensor communicate with each other. Concerning the power supply, we decided on the Universal Serial Bus in order to transmit power to the Raspberry Pi and ESP-32. For the LED, we used the Electrostatic Discharge Classification (MIL-STD-883E), which measures how susceptible the component is to damage, specifically due to electrostatic discharge if someone touches it. 
+
+\section{7. Preliminary Detailed Design}
+The parts list for this project can be divided into two distinct categories, TSD provided parts, and parts needed to be purchased. The first portion of Figure 8 are the parts needed to be purchased from an outside vendor with the dark blue items being provided by TSD. All purchased parts will be ensured to implement with the Raspberry Pi, the primary microcontroller for this project. 
+
+\subsection{1. Component Selection}
+In the initial stages of the project as we worked to develop our proof of concept, our choices for medical sensors were largely dictated by what TSD had on hand. However, at the initial stage of the project we did have to make one very important component decision. That was which microcontroller to use to interface between our sensors and our Raspberry Pi computer. We decided to use the Espressif made ESP-32 WROOM as the primary microcontroller for the project. The ESP-32 has Wi-Fi and Bluetooth connectivity in addition to a USB serial connection. This gives us a good deal of flexibility for software interfaces without the use of Application Programing Interfaces. The ESP-32 also has I2C pins as well as basic analog and digital in/out pins. This gives us versatility for connecting sensors.
+
+\subsection{2. Parts List and Budget}
+The parts list for this project can be divided into two distinct categories, TSD provided parts, and parts needed to be purchased. The first portion of Figure 18 are the parts needed to be purchased from an outside vendor with the dark blue items being provided by TSD. All purchased parts will be ensured to be able to  be implemented with the Raspberry Pi and the ESP-32, the primary computer and  microcontroller for this project.
+
+%Description
+%	Manufacturer
+%	Unit Cost
+%	Quantity
+%	Cost
+%	Vital Signs Monitoring Raspberry Pi Hat Kit
+%	HealthyPi
+%	$271.21
+%	1
+%	$271.21
+%	Raspberry Pi Touchscreen
+%	SmartiPi
+%	$59.99
+%	1
+%	$59.99
+%	Raspberry Pi Touchscreen Case
+%	SmartiPi
+%	$27.99
+%	1
+%	$27.99
+%	Barcode Scanner
+%	Adafruit Industries
+%	$50.00
+%	1
+%	$50.00
+%	Flex Cable for Raspberry Pi Camera
+%	Adafruit Industries
+%	$5.95
+%	1
+%	$5.95
+%	Blood Pressure Monitor with USB Data Link
+%	Microlife
+%	$135.99
+%	1
+%	$135.99
+%	High Resolution Raspberry Pi Camera (TSD Provided)
+%	Raspberry Pi
+%	$29.95
+%	1
+%	$29.95
+%	Pulse Sensor (TSD Provided)
+%	World Famous Electronics
+%	$24.99
+%	2
+%	$49.98
+%	IR Thermometer (TSD Provided)
+%	Sparkfun
+%	$37.44
+%	2
+%	$74.88
+%	Raspberry Pi Starter Kit (TSD Provided)
+%	Virlos
+%	$79.99
+%	1
+%	$79.99
+%	WI-FI and BT Compatible MCU (TSD Provided)
+%	Espressif
+%	$10.00
+%	1
+%	$10.00
+%	Robotic Arm (TSD Provided)
+%	TSD
+%	$25.00
+%	1
+%	$25.00
+%	Shipping (15% of Parts to Purchase Cost)
+%	 
+%	 
+%	 
+%	$82.64
+%	Parts to Purchase and Shipping Total
+%	 
+%	 
+%	 
+%	$633.56
+%	Total (All Parts and Shipping)
+%	 
+%	 
+%	 
+%	$841.17
+%	 
+Figure 18: A chart displaying the list of required components for our project. Parts already owned by TSD are in dark blue while parts that required purchase are in light blue. The manufacturer and cost of each component, shipping cost, and total costs are also displayed. 
+
+
+\subsection{3. Mechanical Drawings}
+We plan to create a mount that will be used as a payload for a Boston Dynamics ``Spot'' robot. Using the open source stereolithography files provided by Boston Dynamics as a reference we created this preliminary mechanical drawing of the mount. The mount will be made of ABS plastic, and we plan on having all of the components laid out on the base. The robotic arm will be mounted with an IR thermometer and a camera.
+Figure 19: A preliminary mechanical drawing of the mount and component configuration that will be used as a Spot payload
+   
+\subsection{4. Circuit Diagrams}
+The following is our circuit diagram: the IR Sensor utilizes I2C serial protocol, and requires pull-up resistors for SDA and SLC buses. The Raspberry-Pi provides common ground, 3.3 V power for sensors, and 5 V power (USB) for the MCU. The LED is connected to MCU and lights up in conjunction with the patient’s heartbeat. 
+  
+
+Figure 20: A preliminary circuit schematic of our prototype system. Note the voltage source represents 5 V USB power from the Raspberry Pi to the MCU.
+
+\subsection{5. Prototypes}
+The following are pictures of the Robotic Arm prototype and the Electrical System prototype. We used this prototype to begin creating the interface between the MCU and the sensors as well as to begin actuating servo motors through PWM commands from the MCU.
+
+Figure 21 and 22: The robotic arm that will be used to provide a proof of concept for the project (left). The prototype electrical subsystem (right). 
+
+\subsection{6. Software Structure}
+Our development environment is on the Raspberry Pi computer. The python based computer vision code is executed on the Raspberry Pi and filters images from the camera unit affixed to the Raspberry Pi. The MCU is programmed using a micropython based development environment on the Raspberry Pi. The code is then sent via a Wi-Fi enabled terminal to the ESP-32 which executes the micropython code to control the actuators and read data in from the sensors. 
+
+Figure 23: A flowchart outlining how the different hardware components interface with each other through software systems and signals.
+
+\section{8. Proposed Work}
+\subsection{1. Work Breakdown Structure}
+Due to the nature of the COVID-19 pandemic, the work breakdown structure created for the spring semester will be constantly changing. The structure consists of three subsystems: Mounting and Actuation (Dietrich), Controllers and Sensors (Stites), and Facial Recognition and Data Storage (Peralta).  
+Mounting and Actuation Subsystem (Dietrich)
+* Five Servos
+   * Ensure that all servos are functional
+   * Utilize the correct servos for movement as desired → 2 axes of rotation
+   * Determine a way to align pins with respective servos (complete)
+* Hinges
+   * Ensure that hinges do not need to be replaced
+* Arm Extension
+   * Determine which instrument to fit in extension
+   * Ensure instrument fits correctly → provides proper reach
+* Mount
+   * Ensure mount is rigid and steady 
+   * Ensure weight requirements are met
+   * Successfully balance components on mount
+
+Controller and Sensor Subsystem (Stites)
+* Link Raspberry Pi and MCU
+   * Establish Wi-Fi connection between pi and ESP-32 (complete)
+   * Practice using development environment and the micropython terminal (complete)
+* Link MCU and Sensors
+   * Establish pulse sensor link (complete)
+   * Establish IR sensor link (complete)
+   * Establish BP cuff link
+   * Establish Barcode Scanner link
+* Build Circuit
+   * Build sensor/MCU connections (partially complete)
+   * Build actuator/MCU connections (partially complete)
+* Link MCU and Actuators
+   * Create servo and MCU connection code (partially complete)
+* Link Actuators to CV code via MCU and Raspberry Pi
+   * Find interface between CV code and micropython terminal on the Pi
+* Write Micropython Code to Actuate Based on Sensor Inputs
+   * Set up mbed to control unneeded servos on the arm. 
+
+Facial Recognition and Data Storage Subsystems (Peralta)
+* Detection software
+   * Receive Haar Classifier
+   * RasPi implementation
+* Detection systems
+   * Select proper camera for video feed
+   * RasPi to camera uplink and interface
+   * Test RasPi camera with facial recognition software (bench demo)
+* Data Collection
+   * View RasPi data outputs
+   * Troubleshoot for improper values
+* Data Organization
+   * Read data outputs to a table
+   * Match table entries with barcode scanner
+
+Dependencies:
+* Computer vision code will have to function properly by returning a centroid before the arm can be actuated based on centroid position.
+* All sensors must be connected to the MCU before data can be displayed.
+* CADing must be completed before the arm and other hardware can be tested in the final payload configuration.
+
+\subsection{1. Timeline}
+The following graphic breaks down how we intend to structure our deadlines and work schedule next semester. 
+%
+%	Member #1 (Stites)
+%	Member #2 (Dietrich)
+%	Member #3 (Peralta)
+%	Week (M)
+%	Note
+%	Planned Activities
+%	Actual Hrs
+%	Planned Activities
+%	Actual Hrs
+%	Planned Activities
+%	Actual Hrs
+%	1
+%	Jan 18
+%	M= MLK, T=M
+%	Establish interface with remaining sensors.
+%	3
+%	Ensure that all servos are functional 
+%	2
+%	Finish RasPi camera software integration
+%	3
+%	2
+%	J 25
+%	
+%
+%	Feed centroid data to the Micropython terminal from the CV terminal.
+%	3
+%	Utilize Servos correctly for 2 degrees of freedom 
+%	
+%
+%3
+%	Read centroid data
+%	3
+%	3
+%	Feb 1
+%	 
+%	Actuate arm from CV data.
+%	3
+%	Determine Instrument for  and fit it properly
+%	1
+%	Organize centroid data in basic table
+%	3
+%	4
+%	Feb 8
+%	
+%
+%	Have the IR sensor maneuver to the forehead.
+%	3
+%	Acquire Base and fit all hardware to it evenly
+%	2
+%	Accurately scan patient’s bar code
+%	3
+%	5
+%	F 15
+%	M= Pres Day
+%	
+%
+%Our 6 week deliverables are:
+%* All hardware mounted to the payload.
+%* All sensors functioning and actuating the arm.
+%	6
+%	F 22
+%	X Wk
+%
+%	Ensure all sensor data is displayed properly. 
+%	3
+%	Troubleshoot Robotic Arm axes of rotation
+%	2
+%	Match bar code scanner ID with centroid data in table
+%	3
+%	7
+%	Mar 1
+%	 6 wk grds T
+%
+%
+%	Assist with mounting or CADing final components.
+%	3
+%	Ensure Robotic Arm reach is adequate ISO Sensor
+%	         
+%
+%
+%          2
+%	Troubleshoot software
+%	3
+%	9
+%	M 8 
+%	
+%
+%	Assist in ironing out CV code and sensor thresholds.
+%	3
+%	Reassess balance of components on base 
+%	1
+%	Make organized table simple and easy to use for medical personnel
+%	3
+%	10
+%	M 15
+%	 
+%	Test system functionality.
+%	3
+%	Reserve for Troubleshoot
+%	3
+%	Test system software
+%	3
+%	11
+%	M 22
+%	
+%
+%	Reserve week for unforeseen delays. 
+%	3
+%	Reserve for Troubleshoot
+%	3
+%	Reserve for additional work
+%	3
+%	12
+%	M 29 
+%	Ac Reserve 
+%	Our 12 week deliverables are:
+%* Completed payload and test system functionality. 
+%	13
+%	Apr 5 
+%	M= no class
+%12 wk Grades W
+%	* Share draft poster with adviser for comments.   Use template.
+%
+%
+%	14
+%	A 12
+%	 
+%	* Submit poster to MSC for printing.
+%	15
+%	A 19 
+%	
+%
+%	* Share draft report with adviser for comments. Use template.
+%* Capstone day.
+%
+%
+%	16
+%	A 26
+%	
+%
+%	* Rejoice in completion and create patents for mass production and future riches.
+%	17
+%	May 3
+%	W= last day of class
+%	* Schedule technology transfer with adviser.
+%
+%
+%	
+%
+Figure 24: Potential work schedule for next semester. 
+   
+\subsection{2. Risk management}
+Managing risks, especially with the unique Spring semester ahead of us, will be extremely important. Below are several identified risks and their associated mitigations.
+
+1. Ordering incompatible sensors/equipment (RA1) - Technical risk. Can cause serious consequences on the project’s schedule. The bulk of this project is dependent on sensors integrating with the RaspberryPi and ESP-32. Ordering any parts that are not compatible with these microcontrollers can delay the project by several weeks. To mitigate this we will ensure all ordered sensors and additional components are compatible with the microcontrollers.
+
+2. New programming language, Python (RA2) - Technical risk. Facial recognition is essential to this project, and luckily the Haar classifier algorithm was provided by Prof. Broussard but the micropython needed to interact with the sensors and RasPi will be difficult. This can be mitigated by consistently seeking guidance from our advisor, Prof. Evangelista, and other faculty members as questions arise.
+ 
+3. Quarantine of team member (RA3) - Programmatic risk. Quarantine and isolation due to COVID-19 will put a team member out of work for at least fourteen days and severely impact work on their particular subsystem. This can be mitigated by abiding by all COVID precautions set forth by the state, federal, and USNA public health experts.
+
+4. Unable to access equipment due to COVID-19 (RA4) - Business risk. The impact of COVID-19 next semester may prevent the entire team from meeting in person and accessing hardware. We will plan a path to completion which requires no access to USNA facilities. The depth of the project will be limited but a proof of concept will be obtained.
+
+5. Ground bot unable to integrate with robot arm (RA5) - Programmatic risk. While not severe, if the ground bot is unable to integrate with the robot arm the original design would need to be altered and would delay project work. This can be mitigated by utilizing the machine shop early and draft connections from the robot arm to the ground bot.
+
+6. Damaged equipment (RA6) - Technical risk. The RaspberryPi and ESP-32 are sensitive microcontrollers. Fortunately TSD does have an abundant supply of these, but precautions will be made to ensure team members do not endanger the equipment. 
+        The following figure illustrates our decision process for assigning a level of risk to each identified risk element. 
+  
+
+Figure 25: Risk level and justification for each potential risk. 
+  
+\subsection{3. Demonstration and Testing Plan}
+The goal for the test plan is to prove our array of sensors can function simultaneously in one environment, the Raspberry Pi, and if we need multiple environments want to prove that both microcontrollers can work together practically. We can accomplish this goal by detecting a forehead centroid from an image, and demonstrating the MCU and Raspberry Pi can accurately read in and display data from the sensor network. Additionally, we would like to integrate a servo motor to move based on a sensor’s reading. This proves that our network moves beyond sensing and can also decide and act from an external input. If we can achieve this, we can show that we have the sensor and microcontroller capabilities and data environment to begin creating the system that can then display essential data to the user. This bench demonstration relates to all the objectives outlined in this report by assessing the speed at which these sensors communicate and send data to the MCU interface. 
+
+For our test we will need several sensors to demonstrate they can communicate with the Raspberry Pi. We will need the following to achieve this: ESP-32 MCU, Raspberry Pi with Camera, IR Thermometer, Pulse Sensor, Servo Motor, and any associated equipment. 
+
+We will begin the bench test by initializing all necessary sensors and equipment such as the Raspberry Pi and ESP-32. The primary environment we will be using will be the Raspberry Pi’s display with the ESP-32 linked terminal. We will then run the program which will activate the sensors and send data to the environment. The MCU will also light up an LED whenever the pulse sensor detects a heartbeat. We will be using the equipment on ourselves but do not anticipate any safety concerns. The IR thermometer will be feeding in data to the environment, we will determine its accuracy and will hopefully be turning a servo motor. 
+
+* Pseudo micropython code for the demonstration is as follows:
+   * Initialize camera.
+   * Initialize sensors.
+   * Scan barcode and display result.
+   * Loop:
+      * Display image with centroid on forehead identified. 
+      * Detect and display heart rate.
+      * Detect and display respiration rate.
+      * Detect and display blood pressure.
+      * Temperature detected?
+      * If detected:
+         * Display temperature and store in database
+         * Break loop.
+      * Else:
+         * Move the servo mounted with the thermometer 10 degrees.
+         * Repeat.
+   * End.
+
+Our measurements will be the following Boolean functionality checks:
+   * Is a data array retrieved from each medical sensor and displayed correctly?
+   * Does the barcode scanner successfully identify and return data based on its scans?
+   * Does the Haar classifier successfully identify a forehead centroid and is the image correctly displayed?
+   * Can all the data and images be easily displayed and accessed on the Raspberry Pi?
+   * Can the MCU move the servo motor  based on data read in from the IR sensor?
+
+From the bench demonstration we will have the baseline sensors, interfaces, and code to begin implementing the decision/actuation portion of the design for next semester. 
+
+\section{9. Benchtop Demonstration}
+\subsection{1. Activities}
+        For the bench top demo we will show our advisor and course instructor our setup. We will then explain the functionality of the system as well as the capabilities and uses of the various sensors and actuators that we have been using for testing. This will entail explaining the setup and use of our IR temperature sensor, pulse sensor, and servo motor. We will also demonstrate our computer vision code and the functionality of the Haar classifier. We will then show our microcontrollers (the ESP-32 and Raspberry Pi) and demonstrate how they interface. We can then give  an overview of our sensor and actuator driver code and code repository. Finally, we will show them the demonstration of all the code being implemented as well as a demonstration that the MCU can move the actuators based on sensor data.
+
+\subsection{2. Results }
+        The procedure has already been implemented and tested prior to the bench demonstration. Therefore, we have no reason to believe that our demo will not meet the requirements laid out above successfully.
+        
+\section{Acknowledgments}
+        We would like to thank all of our comrades who helped make our first semester a raging success. First, our course instructor Professor Devires for teaching us lots of useful information for developing our project and guiding us through the design process. Professor Evangelista for agreeing to advise us during the project and never hesitating to step in and help us debug code when we needed it. CAPT Saperstein for providing us with the necessary medical guidance to develop our idea. Finally, all of TSD, but especially Patrick McCorkel for providing guidance for microcontrol and sensor selection and implementation. We have learned a lot this semester and set a good foundation for our project. We look forward to continuing to build and implement our design next semester.
+         
+%11.        References
+%1. Boston Dynamics, “Boston Dynamics COVID-19 Response” Boston Dynamics , April 23, 2020. [Online]. Available: www.bostondynamics.com [Accessed: Sep. 2, 2020].
+%2. "Coronavirus Disease 2019 (COVID-19)", Centers for Disease Control and Prevention, 2020. [Online]. Available: https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/social-distancing.html. [Accessed: 02- Sep- 2020].
+%3. H. Cai, B. Tu, J. Ma, L. Chen, L. Fu, Y. Jiang and Q. Zhuang, "Psychological impacts and coping strategies of front-line medical staff during COVID-19 outbreak in Hunan, China", Medical Science Monitor, vol. 26, 2020.
+%4. J. Mendoza-Soto, J. Corona-Sánchez and H. Rodríguez- Cortés, "Quadcopter Path Following Control. A Maneuvering Approach", Journal of Intelligent & Robotic Systems, vol. 93, no. 1-2, pp. 73-84, 2018.
+%5. K. P Rane, "Design and Development of Low Cost Humanoid Robot with Thermal Temperature Scanner for COVID-19 Virus Preliminary Identification", International Journal of Advanced Trends in Computer Science and Engineering, vol. 9, no. 3, pp. 3485-3493, 2020. Available: 10.30534/ijatcse/2020/153932020.
+%6. M. Tavakoli, J. Carriere and A. Torabi, "Robotics, Smart Wearable Technologies, and Autonomous Intelligent Systems for Healthcare During the COVID‐19 Pandemic: An Analysis of the State of the Art and Future Vision", Advanced Intelligent Systems, vol. 2, no. 7, p. 2000071, 2020.
+\end{document}
