@@ -1,17 +1,34 @@
 ﻿\documentclass[10pt]{article}
 
+\usepackage{wrcecapstone}
+\hypersetup{
+  pdfauthor={Nathan Dietrich, Alex Peralta, and Corwin Stites},
+  pdftitle={Contagion Crushing Corporation and Partnership -- Medbot},
+  pdfsubject={weapons, robotics, and control engineering},
+  pdfkeywords={medical robotics, covid-19}
+}
+\coursenumber{EW401}
+\student{MIDN 1/C N.~Dietrich, MIDN 1/C A.~Peralta, and MIDN 1/C C.~Stites}
+\advisor{Assistant Professor D. Evangelista}
+
+
 \title{Contagion Crushing Corporation and Partnership -- MedBot}
 \author{MIDN 1/C Nathan Dietrich, Alex Peralta, and Corwin Stites}
-\date{December 3, 2020}
+\date{\printdate{12/3/2020}}
 
 \begin{document}
-\maketitle
+\maketitlepage
+\cleardoublepage
+\tableofcontents
+%\listoffigures
+%\listoftables
 
+%first page
+\clearpage
+\maketitle
 \begin{abstract}
 With the outbreak of the COVID-19 pandemic the social distancing and isolation of potential carriers and sick patients has become crucial. Autonomous systems provide a unique ability to interact with patients while allowing healthcare workers to remain distant from a potential carrier of a virulent disease. This use of mobile autonomous systems has potential to protect medical workers and conserve personal protective equipment. This project focuses on the application of an autonomous mobile system to the collection of a patient’s vital signs at the request of our customer, the head of USNA’s COVID-19 response, CAPT Saperstein M.D. The project focus has become centered on providing a payload to interface with Boston Dynamics’ Spot mobile robot. This payload will provide the necessary sensors, actuators, controllers, and interface to interact with patients and take medical data. As we reach the closure of this semester, we have narrowed our design focus and begun doing the preliminary work of developing our sensor, actuator, and microcontroller interface. This paper describes the problem assessment, design decisions, and preliminary work on the ground based robot payload which will identify patients and scan patients’ vital signs into a database for medical personnel access. 
 \end{abstract}
-
-%\tableofcontents
 
 \section{1. Introduction}        
 As we returned to USNA at the beginning of the semester the ongoing COVID-19 pandemic was drastically altering life for people in the US and  around the world. As the semester has progressed, emergency rooms and intensive care units have continued to be  inundated with COVID-19 patients. Personal protective equipment continues to be in short supply and medical workers continue to be overworked and put at constant risk as they treat patients with the disease. Engineering is all about using science and technology to find solutions to problems and many engineering firms have already begun using autonomous systems to solve problems presented by the pandemic. We saw our capstone project as an opportunity to gain research experience into a subject that could be beneficial to a very pressing problem in our society. We choose to focus our project on investigating how we could build an autonomous system that could be used to help patients and medical workers being affected by COVID-19 and any other dangerous disease in the future.
@@ -274,7 +291,7 @@ Another important facet to this project is patient ID scanning. The collected vi
 %	Can fully complete the project.
 %	
 \begin{figure}
-\caption{Figure 9: Objective 5 metrics and justification.
+\caption{Figure 9: Objective 5 metrics and justification.}
 \label{fig:9}
 \end{figure}
 
@@ -958,6 +975,7 @@ From the bench demonstration we will have the baseline sensors, interfaces, and 
 %5. K. P Rane, "Design and Development of Low Cost Humanoid Robot with Thermal Temperature Scanner for COVID-19 Virus Preliminary Identification", International Journal of Advanced Trends in Computer Science and Engineering, vol. 9, no. 3, pp. 3485-3493, 2020. Available: 10.30534/ijatcse/2020/153932020.
 %6. M. Tavakoli, J. Carriere and A. Torabi, "Robotics, Smart Wearable Technologies, and Autonomous Intelligent Systems for Healthcare During the COVID‐19 Pandemic: An Analysis of the State of the Art and Future Vision", Advanced Intelligent Systems, vol. 2, no. 7, p. 2000071, 2020.
 
-%\nocite{*}
-%\bibliography{covid.bib}
+\nocite{*}
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,covid.bib}
 \end{document}
